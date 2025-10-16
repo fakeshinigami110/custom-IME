@@ -8,31 +8,36 @@ class BinaryConverter:
         self.engine_config = load_engine_config()
         self.keywords, self.operators = load_keywords_config()
 
-        print("Loaded operators:", self.operators)  # برای دیباگ
-
     def convert_text(self, text):
         """تبدیل متن به باینری"""
         if not text:
             return ""
 
-        # ابتدا عملگرها را جایگزین کن
+        # ابتدا عملگرها را جایگزین کن اما با یک marker
+        operator_replacements = {}
         for op, binary in sorted(self.operators.items(), key=lambda x: len(x[0]), reverse=True):
-            text = text.replace(op, f" {binary} ")
+            if op in text:
+                marker = f"__OP_{len(operator_replacements)}__"
+                operator_replacements[marker] = binary
+                text = text.replace(op, f" {marker} ")
 
         # سپس کلمات کلیدی را جایگزین کن
         words = text.split()
         result = []
 
         for word in words:
-            # اگر از قبل باینری است (عملگر)
-            if all(c in '01 ' for c in word):
-                result.append(word)
+            # اگر marker عملگر است
+            if word.startswith("__OP_") and word in operator_replacements:
+                result.append(operator_replacements[word])
+            # اعداد (شامل 0 و 1)
+            elif self._is_number(word):
+                result.append('$' + self._number_to_binary(word))
             # کلمات کلیدی
             elif word in self.keywords:
                 result.append(self.keywords[word])
-            # اعداد
-            elif self._is_number(word):
-                result.append('$' + self._number_to_binary(word))
+            # ترکیب حروف و اعداد
+            elif self._has_letters_and_numbers(word):
+                result.append(self._convert_mixed_simple(word))
             # حروف و کلمات
             else:
                 result.append(self._convert_letters(word))
@@ -41,6 +46,9 @@ class BinaryConverter:
 
     def _is_number(self, word):
         """بررسی آیا کلمه عدد است"""
+        if word.startswith("__OP_"):
+            return False
+
         if word.startswith('-'):
             rest = word[1:]
         else:
@@ -49,6 +57,42 @@ class BinaryConverter:
         if rest.replace('.', '').isdigit() and rest.count('.') <= 1:
             return True
         return False
+
+    def _has_letters_and_numbers(self, word):
+        """بررسی آیا کلمه ترکیب حروف و اعداد است"""
+        if word.startswith("__OP_"):
+            return False
+
+        has_letters = any(c.isalpha() for c in word)
+        has_numbers = any(c.isdigit() for c in word)
+        return has_letters and has_numbers
+
+    def _convert_mixed_simple(self, text):
+        """تبدیل ترکیب حروف و اعداد - روش ساده"""
+        result = ""
+        i = 0
+        n = len(text)
+
+        while i < n:
+            # اگر کاراکتر عددی است
+            if text[i].isdigit():
+                # پیدا کردن کل عدد
+                j = i
+                while j < n and (text[j].isdigit() or text[j] == '.'):
+                    j += 1
+                number_part = text[i:j]
+                result += "$" + self._number_to_binary(number_part)
+                i = j
+            else:
+                # پیدا کردن کل حروف
+                j = i
+                while j < n and text[j].isalpha():
+                    j += 1
+                letter_part = text[i:j]
+                result += self._convert_letters(letter_part)
+                i = j
+
+        return result
 
     def _convert_letters(self, text):
         """تبدیل حروف به باینری"""
@@ -107,15 +151,16 @@ class BinaryConverter:
 if __name__ == "__main__":
     converter = BinaryConverter()
 
-    print("=== Programming Language Tests ===")
+    print("=== Final Fixed Tests ===")
     tests = [
-        "x <= 12",
-        "x = 3.14",
-        "ali < 3",
-        "y != ali",
-        "if x == 5",
-        "x = a + b * c",
-        "a and b or c"
+        "45hello",  # عدد سپس حروف
+        "hello42world",  # حروف سپس عدد سپس حروف
+        "test123",  # حروف سپس عدد
+        "123test",  # عدد سپس حروف
+        "a20b30",  # حروف-عدد-حروف-عدد
+        "0",  # عدد صفر
+        "1",  # عدد یک
+        "x <= 12 + 1",  # اعداد با عملگرها
     ]
 
     for test in tests:
