@@ -1,4 +1,4 @@
-#include "binaryime.h"
+#include "{{.IMEName}}.h"
 #include <fcitx/inputcontext.h>
 #include <fcitx-utils/key.h>
 #include <fstream>
@@ -7,22 +7,39 @@
 #include <algorithm>
 #include <sstream> 
 
-BinaryIME::BinaryIME(fcitx::Instance* instance) 
-    : stateFactory_([](fcitx::InputContext&) { return new BinaryIMEState; }),
+{{.IMEName}}::{{.IMEName}}(fcitx::Instance* instance) 
+    : stateFactory_([](fcitx::InputContext&) { return new {{.IMEName}}State; }),
       instance_(instance) {
     
-    instance_->inputContextManager().registerProperty("binaryimeState", &stateFactory_);
+    instance_->inputContextManager().registerProperty("{{.IMEName}}State", &stateFactory_);
     loadConfig();
-    FCITX_INFO() << "BinaryIME initialized successfully!";
+    FCITX_INFO() << "{{.IMEName}} initialized successfully!";
 }
 
-void BinaryIME::loadConfig() {
-    FCITX_INFO() << "Loading BinaryIME configuration...";
+void {{.IMEName}}::loadConfig() {
+    FCITX_INFO() << "Loading {{.IMEName}} configuration...";
     
-    std::string configFile = "/usr/share/fcitx5/binaryime/config/binaryime.conf";
+    std::string homeDir = std::getenv("HOME");
+    std::string userConfigFile = homeDir + "/.config/fcitx5/{{.ProjectName}}/config/{{.IMEName}}.conf";
     
-    if (!loadConfigFromFile(configFile)) {
-        FCITX_WARN() << "Using default configuration";
+    std::string systemConfigFile = "/usr/share/fcitx5/{{.ProjectName}}/config/{{.IMEName}}.conf";
+    
+    bool configLoaded = false;
+    
+    if (loadConfigFromFile(userConfigFile)) {
+        FCITX_INFO() << "Loaded user config from: " << userConfigFile;
+        configLoaded = true;
+    } 
+    else if (loadConfigFromFile(systemConfigFile)) {
+        FCITX_INFO() << "Loaded system config from: " << systemConfigFile;
+        configLoaded = true;
+    }
+    
+    if (!configLoaded) {
+        FCITX_WARN() << "No config file found, using default configuration";
+        FCITX_WARN() << "Searched in:";
+        FCITX_WARN() << "  " << userConfigFile;
+        FCITX_WARN() << "  " << systemConfigFile;
         loadDefaultConfig();
     }
     
@@ -35,7 +52,7 @@ void BinaryIME::loadConfig() {
                  << ", Separator: '" << numberSeparator << "'";
 }
 
-bool BinaryIME::loadConfigFromFile(const std::string& filename) {
+bool {{.IMEName}}::loadConfigFromFile(const std::string& filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
         FCITX_ERROR() << "Cannot open config file: " << filename;
@@ -113,8 +130,7 @@ bool BinaryIME::loadConfigFromFile(const std::string& filename) {
     return true;
 }
 
-
-void BinaryIME::loadDefaultConfig() {
+void {{.IMEName}}::loadDefaultConfig() {
     convertNumbers = true;
     unknownBehavior = "keep";
     addSpaces = true;
@@ -156,9 +172,7 @@ void BinaryIME::loadDefaultConfig() {
     };
 }
 
-
-
-void BinaryIME::keyEvent(const fcitx::InputMethodEntry& entry, 
+void {{.IMEName}}::keyEvent(const fcitx::InputMethodEntry& entry, 
                          fcitx::KeyEvent& keyEvent) {
     FCITX_UNUSED(entry);
     
@@ -269,7 +283,7 @@ void BinaryIME::keyEvent(const fcitx::InputMethodEntry& entry,
     keyEvent.filter();
 }
 
-std::string BinaryIME::convertToBinary(const std::string& text, fcitx::InputContext* ic) {
+std::string {{.IMEName}}::convertToBinary(const std::string& text, fcitx::InputContext* ic) {
     if (text.empty()) return "";
     
     FCITX_INFO() << "Converting: '" << text << "' (ConvertNumbers: " << convertNumbers << ")";
@@ -313,7 +327,7 @@ std::string BinaryIME::convertToBinary(const std::string& text, fcitx::InputCont
     return convertTextToBinary(text);
 }
 
-std::string BinaryIME::convertNumber(const std::string& numberStr) {
+std::string {{.IMEName}}::convertNumber(const std::string& numberStr) {
     if (!convertNumbers) {
         std::string result;
         
@@ -356,7 +370,8 @@ std::string BinaryIME::convertNumber(const std::string& numberStr) {
         return numberSeparator + binary;
     }
 }
-std::string BinaryIME::convertSentenceInPrintMode(const std::string& text, bool ignoreKeyword) {
+
+std::string {{.IMEName}}::convertSentenceInPrintMode(const std::string& text, bool ignoreKeyword) {
     std::stringstream ss(text);
     std::string word;
     std::string result;
@@ -401,7 +416,7 @@ std::string BinaryIME::convertSentenceInPrintMode(const std::string& text, bool 
     return result;
 }
 
-std::string BinaryIME::convertTextToBinary(const std::string& text) {
+std::string {{.IMEName}}::convertTextToBinary(const std::string& text) {
     if (text.empty()) return "";
     
     FCITX_INFO() << "Converting text: '" << text << "' (CaseSensitive: " << caseSensitive << ")";
@@ -476,9 +491,7 @@ std::string BinaryIME::convertTextToBinary(const std::string& text) {
     return result;
 }
 
-
-
-std::string BinaryIME::convertSentenceToBinary(const std::string& sentence) {
+std::string {{.IMEName}}::convertSentenceToBinary(const std::string& sentence) {
     if (sentence.empty()) return "";
     
     FCITX_INFO() << "Converting sentence: '" << sentence << "'";
@@ -523,15 +536,15 @@ std::string BinaryIME::convertSentenceToBinary(const std::string& sentence) {
     return result;
 }
 
-std::string BinaryIME::processWord(const std::string& word) {
+std::string {{.IMEName}}::processWord(const std::string& word) {
     return convertToBinary(word, nullptr);
 }
 
-bool BinaryIME::isNumber(const std::string& str) {
+bool {{.IMEName}}::isNumber(const std::string& str) {
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
 }
 
-void BinaryIME::updatePreedit(fcitx::InputContext* ic) {
+void {{.IMEName}}::updatePreedit(fcitx::InputContext* ic) {
     auto* state = ic->propertyFor(&stateFactory_);
     
     if (state->currentText.empty()) {
@@ -565,7 +578,7 @@ void BinaryIME::updatePreedit(fcitx::InputContext* ic) {
     ic->updateUserInterface(fcitx::UserInterfaceComponent::InputPanel);
 }
 
-void BinaryIME::commitConversion(fcitx::InputContext* ic) {
+void {{.IMEName}}::commitConversion(fcitx::InputContext* ic) {
     auto* state = ic->propertyFor(&stateFactory_);
     if (!state->currentText.empty()) {
         std::string converted;
@@ -586,4 +599,4 @@ void BinaryIME::commitConversion(fcitx::InputContext* ic) {
     }
 }
 
-FCITX_ADDON_FACTORY(BinaryIMEFactory)
+FCITX_ADDON_FACTORY({{.IMEName}}Factory)

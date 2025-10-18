@@ -1,5 +1,5 @@
-#ifndef _FCITX5_BINARYIME_BINARYIME_H_
-#define _FCITX5_BINARYIME_BINARYIME_H_
+#ifndef _FCITX5_{{.ProjectName | ToUpper}}_{{.IMEName | ToUpper}}_H_
+#define _FCITX5_{{.ProjectName | ToUpper}}_{{.IMEName | ToUpper}}_H_
 
 #include <fcitx/inputmethodengine.h>
 #include <fcitx/addonfactory.h>
@@ -11,15 +11,15 @@
 #include <unordered_map>
 #include <string>
 
-class BinaryIMEState : public fcitx::InputContextProperty {
+class {{.IMEName}}State : public fcitx::InputContextProperty {
 public:
     std::string currentText;
-    int dualMode = 0; // 0=BINARY, 1=TOGGLE, 2=PRINT
+    int dualMode = 0;
     bool ignoreNextKeyword = false;
     std::string pendingConversion;
     
     void copyTo(fcitx::InputContextProperty* other) override {
-        auto* otherState = static_cast<BinaryIMEState*>(other);
+        auto* otherState = static_cast<{{.IMEName}}State*>(other);
         otherState->dualMode = dualMode;
         otherState->ignoreNextKeyword = ignoreNextKeyword;
     }
@@ -27,9 +27,9 @@ public:
     bool needCopy() const override { return true; }
 };
 
-class BinaryIME : public fcitx::InputMethodEngineV2 {
+class {{.IMEName}} : public fcitx::InputMethodEngineV2 {
 public:
-    BinaryIME(fcitx::Instance* instance);
+    {{.IMEName}}(fcitx::Instance* instance);
     
     void keyEvent(const fcitx::InputMethodEntry& entry, 
                   fcitx::KeyEvent& keyEvent) override;
@@ -51,29 +51,27 @@ private:
     void commitConversion(fcitx::InputContext* ic);
     
     std::unordered_map<std::string, std::string> charMap;
-    std::unordered_map<std::string, std::string> capitalMap; 
+    std::unordered_map<std::string, std::string> capitalMap;
     std::unordered_map<std::string, std::string> digitsMap;
     std::unordered_map<std::string, std::string> keywords;
     std::unordered_map<std::string, std::string> operators;
-    std::unordered_map<std::string, std::string> specialMap; 
-
+    std::unordered_map<std::string, std::string> specialMap;
 
     bool convertNumbers = true;
     bool addSpaces = true;
-    bool caseSensitive = false; 
+    bool caseSensitive = false;
     std::string unknownBehavior = "keep";
     std::string numberSeparator = "$";
 
-
-    fcitx::FactoryFor<BinaryIMEState> stateFactory_;
+    fcitx::FactoryFor<{{.IMEName}}State> stateFactory_;
     fcitx::Instance* instance_;
 };
 
-class BinaryIMEFactory : public fcitx::AddonFactory {
+class {{.IMEName}}Factory : public fcitx::AddonFactory {
 public:
     fcitx::AddonInstance* create(fcitx::AddonManager* manager) override {
-        return new BinaryIME(manager->instance());
+        return new {{.IMEName}}(manager->instance());
     }
 };
 
-#endif // _FCITX5_BINARYIME_BINARYIME_H_
+#endif

@@ -1,8 +1,0 @@
-[Addon]
-Name=binaryime
-Category=InputMethod
-Version=@PROJECT_VERSION@
-Library=binaryime
-Type=SharedLibrary
-OnDemand=True
-Configurable=True
