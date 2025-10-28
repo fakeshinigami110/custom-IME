@@ -4,18 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"ime-tool/commands"
 )
 
-type Config struct {
-	ProjectName string
-	IMEName     string
-	Label       string
-	Icon        string
-	LangCode    string
-	Description string
-	ConfigFile  string
-	ProjectDir  string
-}
 
 func handleDualFlags(flagShort, flagLong *string, defaultValue string) *string {
 	if *flagShort == defaultValue && *flagLong == defaultValue {
@@ -86,7 +78,7 @@ func main() {
 		desc = handleDualFlags(desc, descLong, "Custom IME")
 		config = handleDualFlags(config, configLong, "")
 
-		cfg := Config{
+		cfg := commands.Config{
 			ProjectName: *project,
 			IMEName:     *name,
 			Label:       *label,
@@ -94,6 +86,10 @@ func main() {
 			LangCode:    *lang,
 			Description: *desc,
 			ConfigFile:  *config,
+		}
+		if err := commands.HandleCreate(cfg); err != nil {
+			fmt.Printf("❌ Error: %v\n", err)
+			os.Exit(1)
 		}
 		
 		handleCreate(cfg)
@@ -106,7 +102,7 @@ func main() {
 		installCmd.Parse(os.Args[2:])
 		
 		projectDir = handleDualFlags(projectDir, projectDirLong, ".")
-		cfg := Config{ProjectDir: *projectDir}
+		cfg := commands.Config{ProjectDir: *projectDir}
 		handleInstall(cfg)
 
 	case "edit":
@@ -124,7 +120,7 @@ func main() {
 			os.Exit(1)
 		}
 		
-		cfg := Config{IMEName: *name}
+		cfg := commands.Config{IMEName: *name}
 		handleEdit(cfg)
 
 	case "list":
@@ -164,7 +160,7 @@ Examples:
   ime-tool list`)
 }
 
-func handleCreate(cfg Config) {
+func handleCreate(cfg commands.Config) {
 	fmt.Printf("Create command called with:\n")
 	fmt.Printf("  Project: %s\n", cfg.ProjectName)
 	fmt.Printf("  IME Name: %s\n", cfg.IMEName)
@@ -176,12 +172,12 @@ func handleCreate(cfg Config) {
 	//  createIME(cfg)
 }
 
-func handleInstall(cfg Config) {
+func handleInstall(cfg commands.Config) {
 	fmt.Printf("Install command called for directory: %s\n", cfg.ProjectDir)
 	// installIME(cfg) 
 }
 
-func handleEdit(cfg Config) {
+func handleEdit(cfg commands.Config) {
 	fmt.Printf("Edit command called for IME: %s\n", cfg.IMEName)
 	// editConfig(cfg) 
 }
