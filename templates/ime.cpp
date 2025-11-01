@@ -93,7 +93,7 @@ bool {{.IMEName}}::loadConfigFromFile(const std::string& filename) {
         if (key.empty() || value.empty()) continue;
         
         if (currentSection == "Settings") {
-            if (key == "convert_numbers") {
+            if (key == "convert_numbers_to_binary") {
                 convertNumbers = (value == "true");
             } else if (key == "unknown_chars_behavior") {
                 unknownBehavior = value;
@@ -190,7 +190,7 @@ void {{.IMEName}}::keyEvent(const fcitx::InputMethodEntry& entry,
     if (key.check(FcitxKey_F8)) {
         keyEvent.filterAndAccept();
         state->dualMode = (state->dualMode + 1) % 3;
-        std::string modeNames[] = {"BINARY", "TOGGLE", "PRINT"};
+        std::string modeNames[] = {"ORG", "TOGGLE", "PRINT"};
         FCITX_INFO() << "Mode: " << modeNames[state->dualMode];
         updatePreedit(ic);
         return;
@@ -479,7 +479,10 @@ std::string {{.IMEName}}::convertTextToBinary(const std::string& text) {
                 result += convertNumber(currentNumber);
                 currentNumber.clear();
             }
-            result += charStr;
+            if (unknownBehavior == "keep"){ 
+                result += charStr;
+            }
+            // ignore the input char if unknownBehavior != "keep"
         }
     }
     
@@ -562,7 +565,7 @@ void {{.IMEName}}::updatePreedit(fcitx::InputContext* ic) {
     }
     
     fcitx::Text preeditText;
-    std::string modeNames[] = {"BINARY", "TOGGLE", "PRINT"};
+    std::string modeNames[] = {"ORG", "TOGGLE", "PRINT"};
     
     if (state->dualMode == 1 || state->dualMode == 2) { 
         preeditText.append(state->currentText + "    [Mode:" + modeNames[state->dualMode] + 

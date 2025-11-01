@@ -1,5 +1,5 @@
-#ifndef _FCITX5_{{.ProjectName | ToUpper}}_{{.IMEName | ToUpper}}_H_
-#define _FCITX5_{{.ProjectName | ToUpper}}_{{.IMEName | ToUpper}}_H_
+#ifndef _FCITX5_{{.ProjectNameUpper}}_{{.IMENameUpper}}_H_
+#define _FCITX5_{{.ProjectNameUpper}}_{{.IMENameUpper}}_H_
 
 #include <fcitx/inputmethodengine.h>
 #include <fcitx/addonfactory.h>
@@ -57,11 +57,11 @@ private:
     std::unordered_map<std::string, std::string> operators;
     std::unordered_map<std::string, std::string> specialMap;
 
-    bool convertNumbers = true;
+    bool convertNumbers = false;
     bool addSpaces = true;
     bool caseSensitive = false;
     std::string unknownBehavior = "keep";
-    std::string numberSeparator = "$";
+    std::string numberSeparator = "";
 
     fcitx::FactoryFor<{{.IMEName}}State> stateFactory_;
     fcitx::Instance* instance_;

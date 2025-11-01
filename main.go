@@ -1,30 +1,80 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"ime-tool/commands"
 )
 
-
 func handleDualFlags(flagShort, flagLong *string, defaultValue string) *string {
 	if *flagShort == defaultValue && *flagLong == defaultValue {
-		return flagShort 
+		return flagShort
 	}
-	
+
 	if *flagShort != defaultValue && *flagLong != defaultValue && *flagShort != *flagLong {
 		fmt.Println("Error: You can't pass two different values for the same flag")
 		printUsage()
 		os.Exit(1)
 	}
-	
+
 	if *flagShort != defaultValue {
 		return flagShort
 	}
-	
+
 	return flagLong
+}
+
+func handleDualFlagsBool(flagShort, flagLong *bool) *bool {
+	
+	if !*flagShort && !*flagLong {
+		return flagShort
+	}else if *flagLong {
+		return  flagLong
+	}else if *flagShort {
+		return flagShort
+	}else {
+		
+		printUsage()
+		os.Exit(1)
+		return flagLong
+	}
+	
+
+	
+}
+
+// تابع برای گرفتن تایید از کاربر
+func askForConfirmation(question string) bool {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf("%s [Y/n]: ", question)
+
+		answer, err := reader.ReadString('\n')
+		if err != nil {
+			return false
+		}
+
+		// حذف فاصله و کاراکترهای جدید
+		answer = strings.TrimSpace(strings.ToLower(answer))
+
+		// اگر Enter زد (پاسخ خالی) یا Y/y زد، تأیید کن
+		if answer == "" || answer == "y" || answer == "yes" {
+			return true
+		}
+
+		// اگر n/no زد، رد کن
+		if answer == "n" || answer == "no" {
+			return false
+		}
+
+		// اگر پاسخ نامعتبر بود، دوباره بپرس
+		fmt.Println("❌ Please enter 'y', 'n', or press Enter for yes")
+	}
 }
 
 func main() {
@@ -36,7 +86,7 @@ func main() {
 	switch os.Args[1] {
 	case "create":
 		createCmd := flag.NewFlagSet("create", flag.ExitOnError)
-		
+
 		// تعریف فلگ‌ها
 		projectLong := createCmd.String("project", "", "Project name (required)")
 		project := createCmd.String("p", "", "Project name (required)")
@@ -59,17 +109,20 @@ func main() {
 		configLong := createCmd.String("config", "", "Custom config file path")
 		config := createCmd.String("c", "", "Custom config file path")
 
+		forceLong := createCmd.Bool("force", false, "Force overwrite existing project")
+		force := createCmd.Bool("f", false, "Force overwrite existing project")
+
 		createCmd.Parse(os.Args[2:])
-		
+
 		projectEmpty := (*project == "" && *projectLong == "")
 		nameEmpty := (*name == "" && *nameLong == "")
-		
+
 		if projectEmpty || nameEmpty {
 			fmt.Println("Error: project and name are required")
 			createCmd.Usage()
 			os.Exit(1)
 		}
-		
+
 		project = handleDualFlags(project, projectLong, "")
 		name = handleDualFlags(name, nameLong, "")
 		label = handleDualFlags(label, labelLong, "Custom")
@@ -77,6 +130,13 @@ func main() {
 		lang = handleDualFlags(lang, langLong, "en")
 		desc = handleDualFlags(desc, descLong, "Custom IME")
 		config = handleDualFlags(config, configLong, "")
+		force = handleDualFlagsBool(force, forceLong)
+
+		// چک کردن کاراکترهای غیرمجاز
+		if strings.Contains(*project, "-") || strings.Contains(*name, "-") {
+			fmt.Println("Error: Project name and IME name cannot contain '-'")
+			os.Exit(1)
+		}
 
 		cfg := commands.Config{
 			ProjectName: *project,
@@ -87,39 +147,63 @@ func main() {
 			Description: *desc,
 			ConfigFile:  *config,
 		}
-		if err := commands.HandleCreate(cfg); err != nil {
+
+		// اگر force نبود و پروژه وجود داشت، از کاربر سوال بپرس
+		if !*force {
+			exists, err := commands.ProjectExists(*project)
+			if err != nil {
+				fmt.Printf("❌ Error checking existing projects: %v\n", err)
+				os.Exit(1)
+			}
+
+			if exists {
+				if !askForConfirmation(fmt.Sprintf("Project '%s' already exists. Overwrite it?", *project)) {
+					fmt.Println("Operation canceled.")
+					os.Exit(0)
+				}
+				// اگر کاربر تأیید کرد، force رو true کن
+				*force = true
+			}
+		}
+
+		if err := commands.HandleCreate(cfg, *force); err != nil {
 			fmt.Printf("❌ Error: %v\n", err)
 			os.Exit(1)
 		}
-		
-		handleCreate(cfg)
 
 	case "install":
 		installCmd := flag.NewFlagSet("install", flag.ExitOnError)
-		projectDirLong := installCmd.String("dir", ".", "Project directory")
-		projectDir := installCmd.String("d", ".", "Project directory")
-		
+		projectNameLong := installCmd.String("project", "", "Project name (required)")
+		projectName := installCmd.String("p", "", "Project name (required)")
+
 		installCmd.Parse(os.Args[2:])
-		
-		projectDir = handleDualFlags(projectDir, projectDirLong, ".")
-		cfg := commands.Config{ProjectDir: *projectDir}
+
+		projectName = handleDualFlags(projectName, projectNameLong, "")
+
+		if *projectName == "" {
+			fmt.Println("Error: project name is required")
+			installCmd.Usage()
+			os.Exit(1)
+		}
+
+		cfg := commands.Config{ProjectName: *projectName}
 		handleInstall(cfg)
 
 	case "edit":
 		editCmd := flag.NewFlagSet("edit", flag.ExitOnError)
 		nameLong := editCmd.String("name", "", "IME name (required)")
 		name := editCmd.String("n", "", "IME name (required)")
-		
+
 		editCmd.Parse(os.Args[2:])
-		
+
 		name = handleDualFlags(name, nameLong, "")
-		
+
 		if *name == "" {
 			fmt.Println("Error: name is required")
 			editCmd.Usage()
 			os.Exit(1)
 		}
-		
+
 		cfg := commands.Config{IMEName: *name}
 		handleEdit(cfg)
 
@@ -151,38 +235,41 @@ Flags for create:
   -L, --lang string       Language code (default "en")
   -D, --desc string       Description (default "Custom IME")
   -c, --config string     Custom config file path
+  -f, --force             Force overwrite existing project
 
 Examples:
   ime-tool create -p myime -n braille -l Brl -c braille.conf
-  ime-tool create --project myime --name braille --label Brl --config braille.conf
-  ime-tool install -d myime
+  ime-tool create --project myime --name braille --label Brl --config braille.conf --force
+  ime-tool install -p myime
   ime-tool edit -n braille
   ime-tool list`)
 }
 
-func handleCreate(cfg commands.Config) {
-	fmt.Printf("Create command called with:\n")
-	fmt.Printf("  Project: %s\n", cfg.ProjectName)
-	fmt.Printf("  IME Name: %s\n", cfg.IMEName)
-	fmt.Printf("  Label: %s\n", cfg.Label)
-	fmt.Printf("  Icon: %s\n", cfg.Icon)
-	fmt.Printf("  Language: %s\n", cfg.LangCode)
-	fmt.Printf("  Config: %s\n", cfg.ConfigFile)
-	
-	//  createIME(cfg)
-}
-
 func handleInstall(cfg commands.Config) {
-	fmt.Printf("Install command called for directory: %s\n", cfg.ProjectDir)
-	// installIME(cfg) 
+	fmt.Printf("Install command called for project: %s\n", cfg.ProjectName)
+	// installIME(cfg)
 }
 
 func handleEdit(cfg commands.Config) {
 	fmt.Printf("Edit command called for IME: %s\n", cfg.IMEName)
-	// editConfig(cfg) 
+	// editConfig(cfg)
 }
 
 func handleList() {
-	fmt.Println("List command called")
-	// listIMEs() 
+	projects, err := commands.HandleList()
+	if err != nil {
+		fmt.Printf("❌ Error listing projects: %v\n", err)
+		return
+	}
+
+	if len(projects) == 0 {
+		fmt.Println("📋 No IME projects found.")
+		fmt.Println("Create your first project with: ime-tool create -p projectname -n imename")
+		return
+	}
+
+	fmt.Println("📋 Available IME projects:")
+	for _, project := range projects {
+		fmt.Printf("  • %s\n", project)
+	}
 }
