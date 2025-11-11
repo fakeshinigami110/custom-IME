@@ -4,29 +4,39 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"ime-tool/commands"
 	"os"
+	"regexp"
 	"strings"
 
-	"ime-tool/commands"
 )
 
-func handleDualFlags(flagShort, flagLong *string, defaultValue string) *string {
-	if *flagShort == defaultValue && *flagLong == defaultValue {
-		return flagShort
-	}
-
-	if *flagShort != defaultValue && *flagLong != defaultValue && *flagShort != *flagLong {
-		fmt.Println("Error: You can't pass two different values for the same flag")
-		printUsage()
-		os.Exit(1)
-	}
-
-	if *flagShort != defaultValue {
-		return flagShort
-	}
-
-	return flagLong
+func isVaildName(input string)bool{
+	pattern := `^[a-zA-z][a-zA-z0-9_]+$`
+	is_matched,_ := regexp.MatchString(pattern , input)
+	return is_matched
 }
+
+func handleDualFlags[T comparable] (flagShort , flagLong *T , defaultValue T)*T {
+	if *flagShort == defaultValue && *flagLong == defaultValue {
+			return flagShort
+		}
+
+		if *flagShort != defaultValue && *flagLong != defaultValue && *flagShort != *flagLong {
+			fmt.Println("Error: You can't pass two different values for the same flag")
+			printUsage()
+			os.Exit(1)
+		}
+
+		if *flagShort != defaultValue {
+			return flagShort
+		}
+
+		return flagLong
+}
+
+
+
 
 func handleDualFlagsBool(flagShort, flagLong *bool) *bool {
 	
@@ -47,7 +57,6 @@ func handleDualFlagsBool(flagShort, flagLong *bool) *bool {
 	
 }
 
-// تابع برای گرفتن تایید از کاربر
 func askForConfirmation(question string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -59,20 +68,16 @@ func askForConfirmation(question string) bool {
 			return false
 		}
 
-		// حذف فاصله و کاراکترهای جدید
 		answer = strings.TrimSpace(strings.ToLower(answer))
 
-		// اگر Enter زد (پاسخ خالی) یا Y/y زد، تأیید کن
 		if answer == "" || answer == "y" || answer == "yes" {
 			return true
 		}
 
-		// اگر n/no زد، رد کن
 		if answer == "n" || answer == "no" {
 			return false
 		}
 
-		// اگر پاسخ نامعتبر بود، دوباره بپرس
 		fmt.Println("❌ Please enter 'y', 'n', or press Enter for yes")
 	}
 }
@@ -87,12 +92,11 @@ func main() {
 	case "create":
 		createCmd := flag.NewFlagSet("create", flag.ExitOnError)
 
-		// تعریف فلگ‌ها
 		projectLong := createCmd.String("project", "", "Project name (required)")
 		project := createCmd.String("p", "", "Project name (required)")
 
-		nameLong := createCmd.String("name", "", "IME name (required)")
-		name := createCmd.String("n", "", "IME name (required)")
+		// nameLong := createCmd.String("name", "", "IME name (required)")
+		// name := createCmd.String("n", "", "IME name (required)")
 
 		labelLong := createCmd.String("label", "Custom", "IME label (short name)")
 		label := createCmd.String("l", "Custom", "IME label (short name)")
@@ -115,16 +119,15 @@ func main() {
 		createCmd.Parse(os.Args[2:])
 
 		projectEmpty := (*project == "" && *projectLong == "")
-		nameEmpty := (*name == "" && *nameLong == "")
 
-		if projectEmpty || nameEmpty {
-			fmt.Println("Error: project and name are required")
+		if projectEmpty == true {
+			fmt.Println("Error: project is required")
 			createCmd.Usage()
 			os.Exit(1)
 		}
 
 		project = handleDualFlags(project, projectLong, "")
-		name = handleDualFlags(name, nameLong, "")
+		name := project
 		label = handleDualFlags(label, labelLong, "Custom")
 		icon = handleDualFlags(icon, iconLong, "fcitx-keyboard")
 		lang = handleDualFlags(lang, langLong, "en")
@@ -133,8 +136,9 @@ func main() {
 		force = handleDualFlagsBool(force, forceLong)
 
 		// چک کردن کاراکترهای غیرمجاز
-		if strings.Contains(*project, "-") || strings.Contains(*name, "-") {
-			fmt.Println("Error: Project name and IME name cannot contain '-'")
+		if isVaildName(*project) == false && isVaildName(*name) == false{
+			fmt.Println(
+				`Error: Project name and IME name should start with digits and it can contain just latin digits , nmbers and _ `)
 			os.Exit(1)
 		}
 
@@ -174,11 +178,11 @@ func main() {
 	case "install":
 		installCmd := flag.NewFlagSet("install", flag.ExitOnError)
 		projectNameLong := installCmd.String("project", "", "Project name (required)")
-		projectName := installCmd.String("p", "", "Project name (required)")
+		projectNameShort := installCmd.String("p", "", "Project name (required)")
 
 		installCmd.Parse(os.Args[2:])
 
-		projectName = handleDualFlags(projectName, projectNameLong, "")
+		projectName := handleDualFlags(projectNameShort, projectNameLong, "")
 
 		if *projectName == "" {
 			fmt.Println("Error: project name is required")
@@ -188,6 +192,31 @@ func main() {
 
 		cfg := commands.Config{ProjectName: *projectName}
 		handleInstall(cfg)
+	
+	case "delete":
+		deleteCmd := flag.NewFlagSet("delete" , flag.ExitOnError)
+		idLong := deleteCmd.Int("id" , 0 , "enter IME's id that you would like to delete (required)")
+		idShort := deleteCmd.Int("i" , 0 , "enter IME's id that you would like to delete (required)")
+
+		deleteLong := deleteCmd.Bool("d" , false , "throw -d or --delete")
+		deleteShort := deleteCmd.Bool("delete" , false , "throw -d or --delete")
+
+		uninstallShort := deleteCmd.Bool("u" , false , "throw -u or --uninstall to uninstall IME from fcitx5")
+		uninstallLong := deleteCmd.Bool("uninstall" , false , "throw -u or --uninstall to uninstall IME from fcitx5")
+
+		deleteCmd.Parse(os.Args[2:])
+
+		id := handleDualFlags(idLong , idShort , 0)
+		
+		del := handleDualFlagsBool(deleteLong ,deleteShort)
+		un := handleDualFlagsBool(uninstallShort, uninstallLong) 
+
+		err := commands.HandleDlete(*id , *del , *un)
+		if err != nil {
+			fmt.Printf("An Error accoured : %v\n" , err)
+			os.Exit(1)
+		}
+
 
 	case "edit":
 		editCmd := flag.NewFlagSet("edit", flag.ExitOnError)
@@ -226,6 +255,7 @@ Commands:
   install   Build and install an IME project
   edit      Edit IME configuration
   list      List installed IMEs
+  delte     use for delete sources or fully unistall an IME.
 
 Flags for create:
   -p, --project string    Project name (required)
@@ -236,6 +266,11 @@ Flags for create:
   -D, --desc string       Description (default "Custom IME")
   -c, --config string     Custom config file path
   -f, --force             Force overwrite existing project
+
+Flags for delete :
+  -i, --ID string                IME number (get it from list flag) int    id (required)
+  -u, --uninstall             use to uninstall the IME from fcitx5 entries
+  -d, --delete                use to delete source codes from your system
 
 Examples:
   ime-tool create -p myime -n braille -l Brl -c braille.conf
@@ -256,7 +291,7 @@ func handleEdit(cfg commands.Config) {
 }
 
 func handleList() {
-	projects, err := commands.HandleList()
+	projects,_, err := commands.RertuenImes()
 	if err != nil {
 		fmt.Printf("❌ Error listing projects: %v\n", err)
 		return
@@ -269,7 +304,7 @@ func handleList() {
 	}
 
 	fmt.Println("📋 Available IME projects:")
-	for _, project := range projects {
-		fmt.Printf("  • %s\n", project)
+	for id, project := range projects {
+		fmt.Printf("%d %s\n", id,project)
 	}
 }

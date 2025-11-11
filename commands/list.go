@@ -5,30 +5,53 @@ import (
 	"path/filepath"
 )
 
-func HandleList() ([]string, error) {
+func RertuenImes() (map[int]string ,string , error){
 	baseDir := filepath.Join(os.Getenv("HOME"), ".config", "custom-ime")
-
-	var projects []string
+	counter := 1
+	projects := make(map[int]string)
 
 	entries, err := os.ReadDir(baseDir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return projects, nil // دایرکتوری وجود نداره = هیچ پروژه‌ای نیست
+			return projects, baseDir,nil 
 		}
-		return nil, err
+		return nil, baseDir,err
 	}
 
 	for _, entry := range entries {
 		if entry.IsDir() {
-			projects = append(projects, entry.Name())
+			projects[counter] = entry.Name()
+			counter++
 		}
 	}
+	return projects , baseDir,err
 
-	return projects, nil
 }
 
+// func HandleList() ([]string, error) {
+// 	baseDir := filepath.Join(os.Getenv("HOME"), ".config", "custom-ime")
+
+// 	var projects []string
+
+// 	entries, err := os.ReadDir(baseDir)
+// 	if err != nil {
+// 		if os.IsNotExist(err) {
+// 			return projects, nil // دایرکتوری وجود نداره = هیچ پروژه‌ای نیست
+// 		}
+// 		return nil, err
+// 	}
+
+// 	for _, entry := range entries {
+// 		if entry.IsDir() {
+// 			projects = append(projects, entry.Name())
+// 		}
+// 	}
+
+// 	return projects, nil
+// }
+
 func ProjectExists(projectName string) (bool, error) {
-	projects, err := HandleList()
+	projects, err := RertuenImes()
 	if err != nil {
 		return false, err
 	}
