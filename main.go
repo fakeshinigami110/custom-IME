@@ -8,56 +8,50 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
 )
 
-func isVaildName(input string)bool{
+func isVaildName(input string) bool {
 	pattern := `^[a-zA-z][a-zA-z0-9_]+$`
-	is_matched,_ := regexp.MatchString(pattern , input)
+	is_matched, _ := regexp.MatchString(pattern, input)
 	return is_matched
 }
 
-func handleDualFlags[T comparable] (flagShort , flagLong *T , defaultValue T)*T {
+func handleDualFlags[T comparable](flagShort, flagLong *T, defaultValue T) *T {
 	if *flagShort == defaultValue && *flagLong == defaultValue {
-			return flagShort
-		}
+		return flagShort
+	}
 
-		if *flagShort != defaultValue && *flagLong != defaultValue && *flagShort != *flagLong {
-			fmt.Println("Error: You can't pass two different values for the same flag")
-			printUsage()
-			os.Exit(1)
-		}
+	if *flagShort != defaultValue && *flagLong != defaultValue && *flagShort != *flagLong {
+		fmt.Println("Error: You can't pass two different values for the same flag")
+		printUsage()
+		os.Exit(1)
+	}
 
-		if *flagShort != defaultValue {
-			return flagShort
-		}
+	if *flagShort != defaultValue {
+		return flagShort
+	}
 
-		return flagLong
+	return flagLong
 }
 
-
-
-
 func handleDualFlagsBool(flagShort, flagLong *bool) *bool {
-	
+
 	if !*flagShort && !*flagLong {
 		return flagShort
-	}else if *flagLong {
-		return  flagLong
-	}else if *flagShort {
+	} else if *flagLong {
+		return flagLong
+	} else if *flagShort {
 		return flagShort
-	}else {
-		
+	} else {
+
 		printUsage()
 		os.Exit(1)
 		return flagLong
 	}
-	
 
-	
 }
 
-func askForConfirmation(question string) bool {
+func AskForConfirmation(question string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -95,8 +89,8 @@ func main() {
 		projectLong := createCmd.String("project", "", "Project name (required)")
 		project := createCmd.String("p", "", "Project name (required)")
 
-		// nameLong := createCmd.String("name", "", "IME name (required)")
-		// name := createCmd.String("n", "", "IME name (required)")
+		nameLong := createCmd.String("name", "", "IME name (required)")
+		name := createCmd.String("n", "", "IME name (required)")
 
 		labelLong := createCmd.String("label", "Custom", "IME label (short name)")
 		label := createCmd.String("l", "Custom", "IME label (short name)")
@@ -127,7 +121,7 @@ func main() {
 		}
 
 		project = handleDualFlags(project, projectLong, "")
-		name := project
+		name = handleDualFlags(name, nameLong, "")
 		label = handleDualFlags(label, labelLong, "Custom")
 		icon = handleDualFlags(icon, iconLong, "fcitx-keyboard")
 		lang = handleDualFlags(lang, langLong, "en")
@@ -136,7 +130,7 @@ func main() {
 		force = handleDualFlagsBool(force, forceLong)
 
 		// چک کردن کاراکترهای غیرمجاز
-		if isVaildName(*project) == false && isVaildName(*name) == false{
+		if isVaildName(*project) == false && isVaildName(*name) == false {
 			fmt.Println(
 				`Error: Project name and IME name should start with digits and it can contain just latin digits , nmbers and _ `)
 			os.Exit(1)
@@ -161,7 +155,7 @@ func main() {
 			}
 
 			if exists {
-				if !askForConfirmation(fmt.Sprintf("Project '%s' already exists. Overwrite it?", *project)) {
+				if !AskForConfirmation(fmt.Sprintf("Project '%s' already exists. Overwrite it?", *project)) {
 					fmt.Println("Operation canceled.")
 					os.Exit(0)
 				}
@@ -192,31 +186,34 @@ func main() {
 
 		cfg := commands.Config{ProjectName: *projectName}
 		handleInstall(cfg)
-	
+
 	case "delete":
-		deleteCmd := flag.NewFlagSet("delete" , flag.ExitOnError)
-		idLong := deleteCmd.Int("id" , 0 , "enter IME's id that you would like to delete (required)")
-		idShort := deleteCmd.Int("i" , 0 , "enter IME's id that you would like to delete (required)")
+		deleteCmd := flag.NewFlagSet("delete", flag.ExitOnError)
+		idLong := deleteCmd.Int("id", 0, "enter IME's id that you would like to delete (required)")
+		idShort := deleteCmd.Int("i", 0, "enter IME's id that you would like to delete (required)")
 
-		deleteLong := deleteCmd.Bool("d" , false , "throw -d or --delete")
-		deleteShort := deleteCmd.Bool("delete" , false , "throw -d or --delete")
+		deleteLong := deleteCmd.Bool("d", false, "throw -d or --delete")
+		deleteShort := deleteCmd.Bool("delete", false, "throw -d or --delete")
 
-		uninstallShort := deleteCmd.Bool("u" , false , "throw -u or --uninstall to uninstall IME from fcitx5")
-		uninstallLong := deleteCmd.Bool("uninstall" , false , "throw -u or --uninstall to uninstall IME from fcitx5")
+		uninstallShort := deleteCmd.Bool("u", false, "throw -u or --uninstall to uninstall IME from fcitx5")
+		uninstallLong := deleteCmd.Bool("uninstall", false, "throw -u or --uninstall to uninstall IME from fcitx5")
 
 		deleteCmd.Parse(os.Args[2:])
+		// fmt.Println("hereee2")
 
-		id := handleDualFlags(idLong , idShort , 0)
-		
-		del := handleDualFlagsBool(deleteLong ,deleteShort)
-		un := handleDualFlagsBool(uninstallShort, uninstallLong) 
-
-		err := commands.HandleDlete(*id , *del , *un)
-		if err != nil {
-			fmt.Printf("An Error accoured : %v\n" , err)
+		id := handleDualFlags(idLong, idShort, 0)
+		if *id == 0 {
+			// s , err := commands.GetDBPath()
+			// fmt.Printf("filepath : %v , err : %v \n" , s ,err)
+			deleteCmd.Usage()
 			os.Exit(1)
 		}
+		// fmt.Println("hereee2")
 
+		del := handleDualFlagsBool(deleteLong, deleteShort)
+		un := handleDualFlagsBool(uninstallShort, uninstallLong)
+		// fmt.Println("hereee")
+		commands.HandleDlete(*id, *del, *un)
 
 	case "edit":
 		editCmd := flag.NewFlagSet("edit", flag.ExitOnError)
@@ -291,7 +288,7 @@ func handleEdit(cfg commands.Config) {
 }
 
 func handleList() {
-	projects,_, err := commands.RertuenImes()
+	projects, _, err := commands.RertuenImes()
 	if err != nil {
 		fmt.Printf("❌ Error listing projects: %v\n", err)
 		return
@@ -305,6 +302,6 @@ func handleList() {
 
 	fmt.Println("📋 Available IME projects:")
 	for id, project := range projects {
-		fmt.Printf("%d %s\n", id,project)
+		fmt.Printf("%d %s\n", id, project)
 	}
 }

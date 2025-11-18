@@ -51,7 +51,7 @@ func RertuenImes() (map[int]string ,string , error){
 // }
 
 func ProjectExists(projectName string) (bool, error) {
-	projects, err := RertuenImes()
+	projects, _,err := RertuenImes()
 	if err != nil {
 		return false, err
 	}
