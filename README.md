@@ -1,14 +1,18 @@
 # Custom IME - Advanced Input Method Engine for fcitx5
 
+<div align=center>
+    
+![GitHub last commit](https://img.shields.io/github/last-commit/fakeshinigami110/custom-ime?style=for-the-badge&labelColor=101418&color=9ccbfb)
 ![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go)
 ![C++](https://img.shields.io/badge/C++-17-00599C?style=for-the-badge&logo=c%2B%2B)
 ![fcitx5](https://img.shields.io/badge/fcitx5-5.1+-blue?style=for-the-badge)
-![License](https://img.shields.io/badge/License-GPL3-green?style=for-the-badge)
+
+</div>
 
 Custom IME is a powerful CLI tool for creating and managing custom Input Method Engines (IMEs) for the fcitx5 input method framework. It enables developers and enthusiasts to create sophisticated input methods with advanced features like real-time character mapping, keyword substitution, and multiple display modes.
 
 ## Quick Demo
-![Watch the demo](link-to-your-video)
+https://github.com/user-attachments/assets/da6df4a6-571b-465b-acb8-d4b6b717da7b
 
 ## Features
 
