@@ -1,5 +1,4 @@
-# Custom IME - Advanced Input Method Engine for fcitx5
-
+<h1 align=center>Custom IME - Input Method Engine for fcitx5</h1>
 <div align=center>
     
 ![GitHub last commit](https://img.shields.io/github/last-commit/fakeshinigami110/custom-ime?style=for-the-badge&labelColor=101418&color=9ccbfb)
