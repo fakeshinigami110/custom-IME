@@ -972,7 +972,7 @@ _deps
 *.dll
 
 # Fortran module files
-*.mod
+
 *.smod
 
 # Compiled Static libraries
@@ -1035,7 +1035,7 @@ _deps
 *.pdb
 
 # Kernel Module Compile Results
-*.mod*
+
 *.cmd
 .tmp_versions/
 modules.order
