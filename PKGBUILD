@@ -6,8 +6,21 @@ pkgdesc="A CLI tool for creating and managing custom Input Method Engines for fc
 arch=('x86_64' 'i686' 'armv7h' 'aarch64')
 url="https://github.com/fakeshinigami110/custom-IME"
 license=('GPL3')
-depends=('fcitx5' 'cmake' 'go' 'git')
-makedepends=('go')
+depends=(
+    'fcitx5'
+    'cmake'
+    'gcc'           
+    'make'          
+    'xcb-proto'    
+    'libxcb'        
+    'expat'        
+    'pkgconf'       
+    'json-c'        
+    'dbus'          
+    'fmt'
+    'unicode-cldr-annotations'           
+)
+makedepends=('go' , 'git')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/fakeshinigami110/custom-IME/archive/v$pkgver.tar.gz")
 sha256sums=('994a8586f21f83f5f849b8b38ebf624acca82437d4f7c335d24fac0ed0eed6c3')  
 
