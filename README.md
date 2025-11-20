@@ -1,4 +1,4 @@
-# Custom IME - Advanced Input Method Engine for fcitx5
+# Custom IME - Input Method Engine for fcitx5
 
 ![Go](https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go)
 ![C++](https://img.shields.io/badge/C++-17-00599C?style=for-the-badge&logo=c%2B%2B)
