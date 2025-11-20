@@ -98,6 +98,24 @@ custom-ime create -p myproject -n cuneiform -l Cun -L en -c test.conf -D "Cuneif
 custom-ime install -p myproject
 ```
 
+### Add IME to fcitx5
+
+#### Open fcitx5 configuration tool
+```bash
+fcitx5-configtool
+# Or via GUI: System Settings > Regional Settings > Input Method
+```
+In fcitx5-configtool:
+
+    Click "+" button
+
+    Uncheck "Only Show Current Language"
+
+    Find your IME (e.g., "Cuneiform")
+
+    Add and apply
+
+
 ### Project Management
 
 ```bash
@@ -113,6 +131,7 @@ custom-ime delete -p myproject -u
 
 ## Configuration
 
+#### IMEs databse is on your `~/.fcitx5-projects.json` please **DO NOT** edit it manually.
 Custom IME uses simple configuration files to define character mappings and behavior. Here's a sample configuration structure :
 
 ```ini
@@ -154,6 +173,13 @@ float=𒑐𒐕𒐕𒑱
 + = 𒁈
 ```
 you can find the full sample on [test.conf](test.conf)
+
+### Edit config file after installation
+#### You can find config file of each project  on <br> `~/.config/custom-ime/projectName/config/projectName.conf` <br>
+after any change use the following command to reaload:
+```bash
+fcitx5 -rd
+```
 ## Usage
 
 ### Input Mode Switching
@@ -174,20 +200,6 @@ Create custom configuration files to define:
 - Operator conversions
 - Behavioral settings
 
-## Project Structure
-
-```
-custom-ime/
-├── main.go                 # Main CLI application
-├── commands/               # Command implementations
-│   ├── create.go          # Project creation logic
-│   ├── install.go         # Installation handlers
-│   ├── delete.go          # Removal functionality
-│   └── list.go            # Project listing
-├── templates/             # CMake and configuration templates
-├── completions/           # Shell completion files
-└── docs/                  # Documentation and man pages
-```
 
 ## Development
 
