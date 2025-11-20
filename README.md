@@ -140,6 +140,7 @@ Custom IME uses simple configuration files to define character mappings and beha
 
 [Settings]
 convert_numbers=false
+# keep / ignore
 unknown_chars_behavior=keep
 add_spaces=true
 number_separator=
