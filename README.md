@@ -8,7 +8,7 @@
 
 </div>
 
-Custom IME is a powerful CLI tool for creating and managing custom Input Method Engines (IMEs) for the fcitx5 input method framework. It enables developers and enthusiasts to create sophisticated input methods with advanced features like real-time character mapping, keyword substitution, and multiple display modes.
+Custom IME is a CLI tool for creating and managing custom Input Method Engines (IMEs) for the fcitx5 input method framework. It enables developers and enthusiasts to create sophisticated input methods with advanced features like real-time character mapping, keyword substitution, and multiple display modes.
 
 ## Quick Demo
 https://github.com/user-attachments/assets/da6df4a6-571b-465b-acb8-d4b6b717da7b
