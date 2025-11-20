@@ -1,0 +1,103 @@
+.TH CUSTOM\-IME 1 "2024" "custom\-ime v1.0.0" "Custom IME Manager"
+
+.SH NAME
+custom\-ime \- A CLI tool for creating and managing custom Input Method Engines for fcitx5
+
+.SH SYNOPSIS
+.B custom\-ime
+[\fIOPTIONS\fR] \fICOMMAND\fR [\fIARGS\fR]...
+
+.SH DESCRIPTION
+.B custom\-ime
+is a command\-line tool that helps users create, install, and manage custom Input Method Engines (IMEs) for the fcitx5 input method framework.
+
+.SH COMMANDS
+.TP
+.B create
+Create a new IME project
+.TP
+.B install
+Build and install an IME project
+.TP
+.B list
+List all installed IME projects
+.TP
+.B delete
+Delete sources or uninstall an IME
+
+.SH CREATE OPTIONS
+.TP
+.B \-p, \-\-project string
+Project name (required, alphanumeric and underscore only)
+.TP
+.B \-n, \-\-name string
+IME name (required, alphanumeric and underscore only)
+.TP
+.B \-l, \-\-label string
+IME label (short name) (default: "Custom")
+.TP
+.B \-i, \-\-icon string
+Icon name (default: "fcitx5\-keyboard")
+.TP
+.B \-L, \-\-lang string
+Language code (default: "en")
+.TP
+.B \-D, \-\-desc string
+Description (default: "Custom IME")
+.TP
+.B \-c, \-\-config string
+Custom config file path
+.TP
+.B \-f, \-\-force
+Force overwrite existing project
+
+.SH INSTALL OPTIONS
+.TP
+.B \-p, \-\-project string
+Project name to install (required)
+
+.SH DELETE OPTIONS
+.TP
+.B \-p, \-\-project string
+Project name to operate on (required)
+.TP
+.B \-d, \-\-delete
+Delete source files from system
+.TP
+.B \-u, \-\-uninstall
+Uninstall IME from fcitx5
+
+.SH EXAMPLES
+.TP
+.B custom\-ime create \-p myime \-n braille \-l Brl
+Create a new braille IME project
+.TP
+.B custom\-ime install \-p myime
+Install the IME project
+.TP
+.B custom\-ime list
+List all available IME projects
+.TP
+.B custom\-ime delete \-p myime \-d \-u
+Delete sources and uninstall IME
+
+.SH FILES
+.TP
+.I ~/.config/custom\-ime/
+Configuration and database directory
+.TP
+.I ~/.local/share/fcitx5/
+fcitx5 user data directory
+
+.SH SEE ALSO
+.BR fcitx5 (1),
+.BR fcitx5\-configtool (1)
+
+.SH BUGS
+Report bugs at: https://github.com/fakeshinigami110/custom-IME/issues
+
+.SH AUTHOR
+Ali Yaghoubi <fakeshinigami110@gmail.com>
+
+.SH LICENSE
+GNU General Public License v3.0

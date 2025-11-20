@@ -38,7 +38,7 @@ func GetDBPath() (string, error) {
 
 
 
-func LoadDB() (*Projects, error) {
+func LoadDB() (Projects, error) {
     path, err := GetDBPath()
     if err != nil {
         return nil, fmt.Errorf("failed to get DB path: %v", err)
@@ -50,18 +50,15 @@ func LoadDB() (*Projects, error) {
     }
     
     if len(data) == 0 {
-        projects := make(Projects)
-        pp := & projects
-        return pp, nil
+        return make(Projects), nil
     }
     
     var projects Projects
     if err := json.Unmarshal(data, &projects); err != nil {
         return nil, fmt.Errorf("failed to parse DB JSON: %v", err)
     }
-    pp := &projects
     
-    return pp, nil
+    return projects, nil
 }
 
 func (db *Projects) Save() error {

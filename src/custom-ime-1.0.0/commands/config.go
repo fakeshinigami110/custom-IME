@@ -19,8 +19,8 @@ type Config struct {
     CreatedAt   time.Time `json:"created_at"`
     UpdatedAt   time.Time `json:"updated_at"`
     Installed   bool      `json:"installed"`
+    InstallPath string    `json:"install_path,omitempty"`
     ProjectPath string    `json:"project_path,omitempty"`
-    Removed     bool       `json:"removed"`
 }
 
 

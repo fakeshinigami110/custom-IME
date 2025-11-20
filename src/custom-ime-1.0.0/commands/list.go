@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 )
 
-
-
-func RertuenImes() ([]string ,string , error){
+func RertuenImes() (map[int]string ,string , error){
 	baseDir := filepath.Join(os.Getenv("HOME"), ".config", "custom-ime")
-	projects := []string{}
+	counter := 1
+	projects := make(map[int]string)
+
 	entries, err := os.ReadDir(baseDir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -20,8 +20,8 @@ func RertuenImes() ([]string ,string , error){
 
 	for _, entry := range entries {
 		if entry.IsDir() {
-			projects =append(projects, entry.Name())
-		
+			projects[counter] = entry.Name()
+			counter++
 		}
 	}
 	return projects , baseDir,err

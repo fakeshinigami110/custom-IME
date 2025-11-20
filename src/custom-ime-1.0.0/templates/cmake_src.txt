@@ -1,0 +1,15 @@
+add_library({{.IMEName}} SHARED {{.IMEName}}.cpp)
+target_link_libraries({{.IMEName}} PRIVATE Fcitx5::Core)
+set_target_properties({{.IMEName}} PROPERTIES PREFIX "")
+
+install(TARGETS {{.IMEName}} DESTINATION "${FCITX_INSTALL_LIBDIR}/fcitx5")
+
+# Addon config file
+configure_file({{.IMEName}}-addon.conf.in {{.IMEName}}-addon.conf)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/{{.IMEName}}-addon.conf" 
+        RENAME {{.IMEName}}.conf 
+        DESTINATION "${FCITX_INSTALL_PKGDATADIR}/addon")
+
+# Input Method registration file
+install(FILES "{{.IMEName}}.conf" 
+        DESTINATION "${FCITX_INSTALL_PKGDATADIR}/inputmethod")

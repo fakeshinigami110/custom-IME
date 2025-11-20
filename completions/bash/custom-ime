@@ -1,0 +1,106 @@
+_custom_ime() {
+    local i cur prev opts cmds
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    cmd=""
+    opts=""
+
+    for i in ${COMP_WORDS[@]}
+    do
+        case "${i}" in
+            custom-ime)
+                cmd="custom-ime"
+                ;;
+            
+            create)
+                cmd+="__create"
+                ;;
+            install)
+                cmd+="__install"
+                ;;
+            list)
+                cmd+="__list"
+                ;;
+            delete)
+                cmd+="__delete"
+                ;;
+            *)
+                ;;
+        esac
+    done
+
+    case "${cmd}" in
+        custom-ime)
+            opts="-h --help create install list delete"
+            if [[ ${cur} == -* ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                    ;;
+            esac
+            ;;
+        
+        custom-ime__create)
+            opts="-p --project -n --name -l --label -i --icon -L --lang -D --desc -c --config -f --force -h --help"
+            if [[ ${cur} == -* ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                -p|--project|-n|--name|-l|--label|-i|--icon|-L|--lang|-D|--desc|-c|--config)
+                    COMPREPLY=()
+                    ;;
+                *)
+                    COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                    ;;
+            esac
+            ;;
+        
+        custom-ime__install)
+            opts="-p --project -h --help"
+            if [[ ${cur} == -* ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                -p|--project)
+                    COMPREPLY=()
+                    ;;
+                *)
+                    COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                    ;;
+            esac
+            ;;
+        
+        custom-ime__list)
+            opts="-h --help"
+            if [[ ${cur} == -* ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            ;;
+        
+        custom-ime__delete)
+            opts="-p --project -d --delete -u --uninstall -h --help"
+            if [[ ${cur} == -* ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                -p|--project)
+                    COMPREPLY=()
+                    ;;
+                *)
+                    COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+complete -F _custom_ime custom-ime

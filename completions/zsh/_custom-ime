@@ -1,0 +1,49 @@
+#compdef custom-ime
+
+_custom_ime() {
+    local state
+    _arguments \
+        '1: :->command' \
+        '*: :->args' \
+        && return 0
+
+    case $state in
+        command)
+            _values "command" \
+                "create[Create a new IME project]" \
+                "install[Build and install an IME project]" \
+                "list[List all IME projects]" \
+                "delete[Delete sources or uninstall an IME]" \
+            ;;
+        args)
+            case $words[2] in
+                create)
+                    _arguments \
+                        '(-p --project)'{-p,--project}'[Project name]:project name:' \
+                        '(-n --name)'{-n,--name}'[IME name]:IME name:' \
+                        '(-l --label)'{-l,--label}'[IME label]:label:' \
+                        '(-i --icon)'{-i,--icon}'[Icon name]:icon:' \
+                        '(-L --lang)'{-L,--lang}'[Language code]:lang:' \
+                        '(-D --desc)'{-D,--desc}'[Description]:description:' \
+                        '(-c --config)'{-c,--config}'[Config file]:config file:_files' \
+                        '(-f --force)'{-f,--force}'[Force overwrite]' \
+                    ;;
+                install)
+                    _arguments \
+                        '(-p --project)'{-p,--project}'[Project name]:project name:' \
+                    ;;
+                delete)
+                    _arguments \
+                        '(-p --project)'{-p,--project}'[Project name]:project name:' \
+                        '(-d --delete)'{-d,--delete}'[Delete source files]' \
+                        '(-u --uninstall)'{-u,--uninstall}'[Uninstall from fcitx5]' \
+                    ;;
+                list)
+                    _arguments \
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_custom_ime "$@"
