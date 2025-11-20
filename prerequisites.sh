@@ -7,7 +7,7 @@ echo "Installing system dependencies for custom-ime..."
 
 # Check if running as root
 if [ "$EUID" -eq 0 ]; then
-    echo "❌ Please do not run as root. Run as normal user."
+    echo "Please do not run as root. Run as normal user."
     exit 1
 fi
 
@@ -37,7 +37,7 @@ elif command -v apt > /dev/null 2>&1; then
     echo "sudo apt update"
     echo "sudo apt install fcitx5 cmake build-essential golang-go git"
     echo ""
-    echo "🔍 Search for available fcitx5 packages:"
+    echo "Search for available fcitx5 packages:"
     echo "   apt-cache search fcitx5"
     
 elif command -v dnf > /dev/null 2>&1; then
@@ -47,7 +47,7 @@ elif command -v dnf > /dev/null 2>&1; then
     echo ""
     echo "sudo dnf install fcitx5 cmake gcc-c++ golang git"
     echo ""
-    echo "🔍 Search for available fcitx5 packages:"
+    echo "Search for available fcitx5 packages:"
     echo "   dnf search fcitx5"
     
 elif command -v yum > /dev/null 2>&1; then
@@ -57,7 +57,7 @@ elif command -v yum > /dev/null 2>&1; then
     echo ""
     echo "sudo yum install fcitx5 cmake gcc-c++ golang git"
     echo ""
-    echo "🔍 Search for available fcitx5 packages:"
+    echo "Search for available fcitx5 packages:"
     echo "   yum search fcitx5"
     
 elif command -v zypper > /dev/null 2>&1; then
@@ -67,7 +67,7 @@ elif command -v zypper > /dev/null 2>&1; then
     echo ""
     echo "sudo zypper install fcitx5 cmake gcc-c++ golang git"
     echo ""
-    echo "🔍 Search for available fcitx5 packages:"
+    echo "Search for available fcitx5 packages:"
     echo "   zypper search fcitx5"
     
 else
