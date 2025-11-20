@@ -9,7 +9,7 @@ license=('GPL3')
 depends=('fcitx5' 'cmake' 'go' 'git')
 makedepends=('go')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/fakeshinigami110/custom-IME/archive/v$pkgver.tar.gz")
-sha256sums=('df753284d9354d790b11e01a03e2fb51189b17b2be695386aa95d6718cba2a47')  
+sha256sums=('SKIP')  
 
 prepare() {
   cd "$pkgname-$pkgver"
