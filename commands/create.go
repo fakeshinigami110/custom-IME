@@ -8,6 +8,25 @@ import (
 
 	"ime-tool/utils"
 )
+func getTemplatePath() (string, error) {
+    if _, err := os.Stat("templates/cmake_main.txt"); err == nil {
+        return "templates", nil
+    }
+    
+    possiblePaths := []string{
+        "/usr/share/custom-ime/templates/",
+        "/usr/local/share/custom-ime/templates/",
+        "/opt/custom-ime/templates/",
+    }
+    
+    for _, path := range possiblePaths {
+        if _, err := os.Stat(filepath.Join(path, "cmake_main.txt")); err == nil {
+            return path, nil
+        }
+    }
+    
+    return "", fmt.Errorf("cannot find templates directory")
+}
 
 func HandleCreate(cfg Config, forceOverwrite bool) error {
 
@@ -90,15 +109,19 @@ func createIME(cfg Config) error {
 		{"ime.conf", filepath.Join(projectDir, "src", cfg.IMEName+".conf")},
 	}
 
+	path , err :=getTemplatePath()
+	if err != nil {
+		return err
+	}
+
 	for _, tmpl := range templates {
-		tmplPath := filepath.Join("templates", tmpl.templateName)
+		tmplPath := filepath.Join(path, tmpl.templateName)
 		if err := generateFromTemplate(tmplPath, tmpl.outputPath, cfg); err != nil {
 			return fmt.Errorf("failed to generate %s: %v", tmpl.templateName, err)
 		}
 		fmt.Printf("%v Generated: %s\n", ResultColor(true),tmpl.outputPath)
 	}
 
-	// مدیریت فایل کانفیگ - با مسیر جدید
 	configDest := filepath.Join(projectDir, "config", cfg.IMEName+".conf")
 	if cfg.ConfigFile != "" {
 		if err := utils.CopyFile(cfg.ConfigFile, configDest); err != nil {

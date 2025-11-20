@@ -43,21 +43,14 @@ build() {
 package() {
   cd "$pkgname-$pkgver"
   
-  # Install binary
   install -Dm755 custom-ime "$pkgdir"/usr/bin/custom-ime
-  
-  # Install man page
   install -Dm644 docs/custom-ime.1 "$pkgdir"/usr/share/man/man1/custom-ime.1
-  
-  # Install license
   install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
   
-  # Install bash completion
+  install -d "$pkgdir"/usr/share/custom-ime/templates
+  install -m644 templates/* "$pkgdir"/usr/share/custom-ime/templates/
+  
   install -Dm644 completions/bash/custom-ime "$pkgdir"/usr/share/bash-completion/completions/custom-ime
-  
-  # Install zsh completion
   install -Dm644 completions/zsh/_custom-ime "$pkgdir"/usr/share/zsh/site-functions/_custom-ime
-  
-  # Install fish completion
   install -Dm644 completions/fish/custom-ime.fish "$pkgdir"/usr/share/fish/vendor_completions.d/custom-ime.fish
 }
