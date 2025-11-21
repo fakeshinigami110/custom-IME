@@ -44,6 +44,8 @@ fi
 # Install to system
 echo "Installing to /usr/local/bin/"
 sudo mv custom-ime /usr/local/bin/
+sudo mkdir -p /usr/share/custom-ime/templates
+sudo cp templates/* /usr/share/custom-ime/templates/
 
 echo "custom-ime installed successfully!"
 echo ""
