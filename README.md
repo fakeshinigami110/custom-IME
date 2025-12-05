@@ -237,5 +237,5 @@ For issues and questions:
 
 **Custom IME** - Empowering custom input methods for specialized workflows and linguistic requirements.
 ---
-### Powered by Omokami (Shinigami_110)
-You can [contact me on Telegram](https://t.me/shinigami_110) using this link.
+### Powered by Omikami (Shinigami_110)
+You can contact me on [Telegram](https://t.me/shinigami_110) using this link.
