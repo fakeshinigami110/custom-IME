@@ -20,7 +20,7 @@ void {{.IMEName}}::loadConfig() {
     FCITX_INFO() << "Loading {{.IMEName}} configuration...";
     
     std::string homeDir = std::getenv("HOME");
-    std::string userConfigFile = homeDir + "/.config/fcitx5/{{.ProjectName}}/config/{{.IMEName}}.conf";
+    std::string userConfigFile = homeDir + "/.config/custom-ime/{{.ProjectName}}/config/{{.IMEName}}.conf";
     
     std::string systemConfigFile = "/usr/share/fcitx5/{{.ProjectName}}/config/{{.IMEName}}.conf";
     
