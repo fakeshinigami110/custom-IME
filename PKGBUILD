@@ -1,7 +1,7 @@
 # Maintainer: Ali Yaghoubi <fakeshinigami110@gmail.com>
 pkgname=custom-ime
-pkgver=1.0.0
-pkgrel=2
+pkgver=1.0.1
+pkgrel=1
 pkgdesc="A CLI tool for creating and managing custom Input Method Engines for fcitx5"
 arch=('x86_64' 'i686' 'armv7h' 'aarch64')
 url="https://github.com/fakeshinigami110/custom-IME"
